@@ -38,8 +38,14 @@
  * 注意：本站可能有 Cloudflare 拦截，Surge 请求若被拦截会直接报出来，
  * 这种情况模块无解，只能手动在浏览器里签到。
  *
- * Cookie 填写（三选一，优先 $argument）：
- *   1. Surge 模块参数（推荐）：nodeloc-cookie.sgmodule 里用 #!arguments 声明了
+ * Cookie 填写（四选一，优先 $argument；另见自动捕获）：
+ *   0. 自动捕获（推荐，不用手动复制）：模块里还有一个 nodeloc-cookie-capture.js
+ *     （http-request 脚本），开关是模块参数 capture_cookie（默认开）。
+ *      开着时，用浏览器打开一次 NodeLoc（登录状态），脚本会自动把请求里的
+ *      Cookie 存下来，签到直接用最新抓到的；手动填的 cookie 参数会被它覆盖。
+ *      不想让它自动抓时，把 capture_cookie 改成 false，或在 Surge 脚本列表里
+ *      单独关掉“NodeLoc Cookie 获取”这一项。
+ *   1. Surge 模块参数（手动）：nodeloc-cookie.sgmodule 里用 #!arguments 声明了
  *      cookie、name，导入模块后在 Surge「编辑参数」里填写。
  *      Cookie 里有 & 请写成 %26（脚本会解码回来）；= 和 ; 不用转义。
  *   2. Surge 脚本的 argument 参数（字符串）：
@@ -81,7 +87,7 @@ $.merge = typeof $argument === "object" && !!$argument && $argument.merge === tr
 
 if ($.merge) $.msg = (...a) => console.log(a.filter((x) => typeof x === "string" && x).join("\n"));
 
-const SCRIPT_VERSION = "2026-11-26.r1";
+const SCRIPT_VERSION = "2026-11-26.r2";
 
 $.log(`[INFO] 脚本版本 ${SCRIPT_VERSION}`);
 
@@ -91,6 +97,8 @@ const ACCOUNTS_KEY = "nodeloc_cookie_accounts";
 const CLEAR_KEY = "nodeloc_cookie_clear";
 const DEBUG_KEY = "nodeloc_cookie_debug";
 const STATUS_KEY = "nodeloc_cookie_status";
+// 捕获开关：模块参数 capture_cookie（true/false），或 BoxJS 的 nodeloc_cookie_capture。
+const CAPTURE_KEY = "nodeloc_cookie_capture";
 
 const IS_LOON = $.isLoon();
 
@@ -128,6 +136,17 @@ function parseArgument(raw) {
         if (k) out[k] = v;
     }
     return out;
+}
+
+// 捕获开关是否打开：模块参数 capture_cookie（true/false），
+// 或 BoxJS 的 nodeloc_cookie_capture；都没填时默认开。
+function isCaptureOn() {
+    const raw = (PLUGIN.capture_cookie !== undefined && PLUGIN.capture_cookie !== null)
+        ? PLUGIN.capture_cookie
+        : $.getdata(CAPTURE_KEY);
+    if (raw === undefined || raw === null || raw === "") return true;
+    if (typeof raw === "boolean") return raw;
+    return !/^(false|0|off|no)$/i.test(String(raw).trim());
 }
 
 // 清理用户粘贴的 Cookie：去首尾空白、去掉 “Cookie:” 前缀、去掉包围的引号。
@@ -241,9 +260,14 @@ function readAccounts() {
         }
     }
 
-    // 3. 单账号：$argument 优先，其次 BoxJS / $persistentStore
-    const cookie = normalizeCookie(PLUGIN.cookie || $.getdata(COOKIE_KEY) || "");
+    // 3. 单账号
+    const argCookie = normalizeCookie(PLUGIN.cookie || "");
+    const storeCookie = normalizeCookie($.getdata(COOKIE_KEY) || "");
     const name = (PLUGIN.name || $.getdata(NAME_KEY) || "").trim();
+    // 捕获开关开着时，优先用捕获脚本存在 $persistentStore 里的最新 Cookie
+    //（浏览器里刚登录过的，比模块参数里手动填的旧 Cookie 新）；
+    // 开关关着时沿用老顺序：模块参数优先，其次 $persistentStore。
+    const cookie = (isCaptureOn() && storeCookie) ? storeCookie : (argCookie || storeCookie);
 
     return cookie ? [{ name, cookie }] : [];
 }

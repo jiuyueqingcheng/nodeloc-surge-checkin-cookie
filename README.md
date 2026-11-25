@@ -25,6 +25,20 @@ NodeLoc（https://www.nodeloc.com）每日签到模块：每天签到一次领**
 
 ## 取 Cookie 的方法
 
+**方法零（推荐）：自动抓——不用手动复制**
+
+模块里带了一个 `nodeloc-cookie-capture.js`（http-request 脚本），开关是模块参数 `capture_cookie`（默认开）。开着时：
+
+1. 在浏览器里登录 NodeLoc（登录时勾上“记住我”，Cookie 更耐用；如果弹验证码先过了）
+2. 用浏览器打开一次 NodeLoc 任意页面
+3. 脚本会自动把请求里的 Cookie 存下来，并弹一次“Cookie 已更新”通知，签到直接用最新抓到的
+
+不想让它自动抓时，把 `capture_cookie` 改成 `false`，或在 Surge 脚本列表里单独关掉“NodeLoc Cookie 获取”这一项。开关开着时，自动抓到的 Cookie 会优先于模块参数里手动填的 `cookie`（因为浏览器里刚登录过的更新）。
+
+注意：自动抓需要 MITM（模块里已配 `www.nodeloc.com`），首次使用请按 Surge 提示安装并信任证书，否则拦截不到 HTTPS 请求，抓不到 Cookie。
+
+如果自动抓不到（比如没装证书），再用下面手动复制的方法：
+
 先在浏览器里登录 NodeLoc（登录时勾上“记住我”，Cookie 更耐用；如果弹验证码，先把验证码过了）。
 
 **方法一（推荐）：开发者工具 Network**
@@ -78,7 +92,8 @@ NodeLoc 现在用的是自研 `/api/v1` 接口（按本站网页前端 `/static/
 | 文件 | 说明 |
 |---|---|
 | `nodeloc-cookie.js` | 签到脚本（Surge / Loon / Quantumult X / Stash 通用） |
-| `nodeloc-cookie.sgmodule` | Surge 模块（cron + 模块参数） |
+| `nodeloc-cookie-capture.js` | 在浏览器里自动抓 Cookie 的脚本（http-request，开关是模块参数 `capture_cookie`，默认开） |
+| `nodeloc-cookie.sgmodule` | Surge 模块（cron 签到 + http-request 抓 Cookie + 模块参数） |
 | `README.md` | 本说明 |
 
 ## 来源

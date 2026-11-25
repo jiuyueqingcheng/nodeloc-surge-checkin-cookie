@@ -1,12 +1,13 @@
 #!name=NodeLoc Cookie 签到
-#!desc=NodeLoc 每日签到领能量（Cookie 版）：用浏览器登录后复制的 Cookie 签到，不填账号密码，适合密码登录触发人机验证的账号。Cookie 和签到时间在模块「编辑参数」里设置。
+#!desc=NodeLoc 每日签到领能量（Cookie 版）：用浏览器登录后复制的 Cookie 签到，不填账号密码，适合密码登录触发人机验证的账号。开着 capture_cookie 时，在浏览器里打开一次 NodeLoc 会自动抓 Cookie。Cookie 和签到时间在模块「编辑参数」里设置。
 #!author=Muse
 #!icon=https://www.nodeloc.com/favicon.ico
-#!arguments=cookie,name,checkin_hour:9,checkin_minute:0
-#!arguments-desc=cookie：浏览器里登录 NodeLoc 后复制的 Cookie（取法见 README；Cookie 里有 & 请写 %26）；name：账号备注，可选，通知里显示用；checkin_hour：每天签到小时（0-23，默认 9）；checkin_minute：每天签到分钟（0-59，默认 0）。Cookie 失效时请重新登录后复制新的。
+#!arguments=cookie,name,checkin_hour:9,checkin_minute:0,capture_cookie:true
+#!arguments-desc=cookie：浏览器里登录 NodeLoc 后复制的 Cookie（取法见 README；Cookie 里有 & 请写 %26），留空则用自动抓到的；name：账号备注，可选，通知里显示用；checkin_hour：每天签到小时（0-23，默认 9）；checkin_minute：每天签到分钟（0-59，默认 0）；capture_cookie：是否在浏览器里自动抓 Cookie（true 开，false 关，默认 true）。
 
 [Script]
-NodeLoc Cookie签到 = type=cron,cronexp="{{{checkin_minute}}} {{{checkin_hour}}} * * *",timeout=60,script-path=https://raw.githubusercontent.com/JiuYueQingCheng/nodeloc-surge-checkin-cookie/main/nodeloc-cookie.js,argument=cookie={{{cookie}}}&name={{{name}}}
+NodeLoc Cookie签到 = type=cron,cronexp="{{{checkin_minute}}} {{{checkin_hour}}} * * *",timeout=60,script-path=https://raw.githubusercontent.com/JiuYueQingCheng/nodeloc-surge-checkin-cookie/main/nodeloc-cookie.js,argument=cookie={{{cookie}}}&name={{{name}}}&capture_cookie={{{capture_cookie}}}
+NodeLoc Cookie获取 = type=http-request,pattern=^https://www\.nodeloc\.com/,requires-body=0,script-path=https://raw.githubusercontent.com/JiuYueQingCheng/nodeloc-surge-checkin-cookie/main/nodeloc-cookie-capture.js,argument=capture_cookie={{{capture_cookie}}}
 
 [MITM]
 hostname = %APPEND% www.nodeloc.com
