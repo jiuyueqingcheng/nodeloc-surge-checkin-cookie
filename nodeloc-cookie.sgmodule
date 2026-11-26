@@ -6,8 +6,8 @@
 #!arguments-desc=cookie：浏览器里登录 NodeLoc 后复制的 Cookie（取法见 README；Cookie 里有 & 请写 %26），留空则用自动抓到的；name：账号备注，可选，通知里显示用；checkin_hour：每天签到小时（0-23，默认 9）；checkin_minute：每天签到分钟（0-59，默认 0）；capture_cookie：是否在浏览器里自动抓 Cookie（true 开，false 关，默认 true）。
 
 [Script]
-NodeLoc Cookie签到 = type=cron,cronexp="{{{checkin_minute}}} {{{checkin_hour}}} * * *",timeout=60,script-path=https://raw.githubusercontent.com/JiuYueQingCheng/nodeloc-surge-checkin-cookie/main/nodeloc-cookie.js,argument=cookie={{{cookie}}}&name={{{name}}}&capture_cookie={{{capture_cookie}}}
-NodeLoc Cookie获取 = type=http-request,pattern=^https://www\.nodeloc\.com/,requires-body=0,script-path=https://raw.githubusercontent.com/JiuYueQingCheng/nodeloc-surge-checkin-cookie/main/nodeloc-cookie-capture.js,argument=capture_cookie={{{capture_cookie}}}
+NodeLoc Cookie签到 = type=cron,cronexp="{{{checkin_minute}}} {{{checkin_hour}}} * * *",timeout=60,script-path=https://cdn.jsdelivr.net/gh/JiuYueQingCheng/nodeloc-surge-checkin-cookie@main/nodeloc-cookie.js,argument=cookie={{{cookie}}}&name={{{name}}}&capture_cookie={{{capture_cookie}}}
+NodeLoc Cookie获取 = type=http-request,pattern=^https://www\.nodeloc\.com/,requires-body=0,script-path=https://cdn.jsdelivr.net/gh/JiuYueQingCheng/nodeloc-surge-checkin-cookie@main/nodeloc-cookie-capture.js,argument=capture_cookie={{{capture_cookie}}}
 
 [MITM]
 hostname = %APPEND% www.nodeloc.com

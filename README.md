@@ -6,10 +6,10 @@ NodeLoc（https://www.nodeloc.com）每日签到模块：每天签到一次领**
 
 ## 安装
 
-1. 在 Surge 里打开模块安装链接：
+1. 在 Surge 里打开模块安装链接（jsdelivr 镜像，国内能打开；如果打不开，换用 GitHub raw 链接：`https://raw.githubusercontent.com/JiuYueQingCheng/nodeloc-surge-checkin-cookie/main/nodeloc-cookie.sgmodule`）：
 
    ```
-   https://raw.githubusercontent.com/JiuYueQingCheng/nodeloc-surge-checkin-cookie/main/nodeloc-cookie.sgmodule
+   https://cdn.jsdelivr.net/gh/JiuYueQingCheng/nodeloc-surge-checkin-cookie@main/nodeloc-cookie.sgmodule
    ```
 
 2. 导入后在模块的「编辑参数」里填写：
