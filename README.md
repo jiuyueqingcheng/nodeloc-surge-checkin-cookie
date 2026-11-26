@@ -2,7 +2,7 @@
 
 NodeLoc（https://www.nodeloc.com）每日签到模块：每天签到一次领**能量**奖励（官方文档：“Check-in successful! You received N Energy”，已签过显示 “You have already checked in today”；能量可用于打赏、红包、抽奖、付费内容等）。
 
-这个版本**不用账号密码登录**，改用浏览器登录后复制的 Cookie 直接调签到接口。适合密码版登录失败次数多了、服务端要求人机验证（captcha）的账号：先在浏览器里登录一次（把验证码过了），复制 Cookie 填进模块参数，之后每天自动签到，不再走登录接口，也就不会再触发登录失败的人机验证。
+这个版本**不用账号密码登录**，改用浏览器登录后自动抓到的 Cookie 直接调签到接口。适合密码版登录失败次数多了、服务端要求人机验证（captcha）的账号：先在浏览器里登录一次（把验证码过了），打开一次页面让模块自动抓 Cookie，之后每天自动签到，不再走登录接口，也就不会再触发登录失败的人机验证。
 
 ## 安装
 
@@ -12,14 +12,13 @@ NodeLoc（https://www.nodeloc.com）每日签到模块：每天签到一次领**
    https://cdn.jsdelivr.net/gh/JiuYueQingCheng/nodeloc-surge-checkin-cookie@main/nodeloc-cookie.sgmodule
    ```
 
-2. 导入后在模块的「编辑参数」里填写：
+2. 导入后在模块的「编辑参数」里只需要确认签到时间（默认 9 点，不用改就不用填）：
 
-   - `cookie`：浏览器里登录 NodeLoc 后复制的 Cookie（取法见下）
-   - `name`：账号备注，可选，通知里显示用
    - `checkin_hour`：每天签到小时（0-23，默认 9）
    - `checkin_minute`：每天签到分钟（0-59，默认 0）
+   - `capture_cookie`：是否自动抓 Cookie（true 开，false 关，默认 true）
 
-   例如每天 8 点 30 分签到，就填 `checkin_hour=8`、`checkin_minute=30`。
+   例如每天 8 点 30 分签到，就填 `checkin_hour=8`、`checkin_minute=30`。`cookie` 和 `name` 不用填（模块参数里已经去掉了），Cookie 由自动捕获负责。
 
 3. Surge 会在设定时间每天自动运行一次。想手动跑一次：Surge → 模块 → NodeLoc Cookie 签到 → 运行脚本（或在脚本页面手动触发）。
 
@@ -33,7 +32,7 @@ NodeLoc（https://www.nodeloc.com）每日签到模块：每天签到一次领**
 2. 用浏览器打开一次 NodeLoc 任意页面
 3. 脚本会自动把请求里的 Cookie 存下来，并弹一次“Cookie 已更新”通知，签到直接用最新抓到的
 
-不想让它自动抓时，把 `capture_cookie` 改成 `false`，或在 Surge 脚本列表里单独关掉“NodeLoc Cookie 获取”这一项。开关开着时，自动抓到的 Cookie 会优先于模块参数里手动填的 `cookie`（因为浏览器里刚登录过的更新）。
+不想让它自动抓时，把 `capture_cookie` 改成 `false`，或在 Surge 脚本列表里单独关掉“NodeLoc Cookie 获取”这一项。开关开着时，自动抓到的 Cookie 会优先于 BoxJS 里手动填的 `nodeloc_cookie`（因为浏览器里刚登录过的更新）。
 
 注意：自动抓需要 MITM（模块里已配 `www.nodeloc.com`），首次使用请按 Surge 提示安装并信任证书，否则拦截不到 HTTPS 请求，抓不到 Cookie。
 
@@ -47,21 +46,21 @@ NodeLoc（https://www.nodeloc.com）每日签到模块：每天签到一次领**
 2. 刷新页面
 3. 点任意一个 `www.nodeloc.com` 的请求
 4. 在 Request Headers 里找到 `Cookie:`，把它冒号后面的**整段值**复制下来
-5. 粘贴到模块参数的 `cookie` 里
+5. 粘贴到 BoxJS 的 `nodeloc_cookie` 里
 
 **方法二：开发者工具 Application**
 
 1. 按 F12 → Application（应用）→ 左侧 Cookies → `https://www.nodeloc.com`
 2. 把里面的 Cookie 按 `name=value; name2=value2` 的形式拼起来
-3. 粘贴到模块参数的 `cookie` 里
+3. 粘贴到 BoxJS 的 `nodeloc_cookie` 里
 
 注意：
 
 - 复制时不要带 `Cookie:` 这几个字本身，脚本会自动去掉。
-- Cookie 会过期（一般能用几周到几个月）。模块报“Cookie 已失效”时，在浏览器重新登录一次，再复制新的 Cookie 更新到模块参数里。
+- Cookie 会过期（一般能用几周到几个月）。模块报“Cookie 已失效”时，在浏览器重新登录一次并打开页面（自动捕获会更新），或复制新的 Cookie 更新到 BoxJS 里。
 - Cookie 等于登录态，泄露等于账号被盗用。**请勿把 Cookie 发到聊天或公开仓库**，只填在 Surge / BoxJS 本地。失效后在网站退出登录即可作废。
 - Cookie 里有 `&` 请写成 `%26`（脚本会解码回来）；`=` 和 `;` 不用转义。
-- Cookie 很长，如果填在模块参数里解析失败，改填 BoxJS（`nodeloc_cookie`，纯文本存储，不经过 argument 解析）。
+- 手动填 Cookie 建议直接填 BoxJS（`nodeloc_cookie`，纯文本存储，不经过 argument 解析）。
 
 ## 运行结果
 
@@ -69,8 +68,8 @@ NodeLoc（https://www.nodeloc.com）每日签到模块：每天签到一次领**
 |---|---|
 | ✅ 今日签到已确认 | 签到成功，显示本次/今日奖励（+N 能量）与当前能量余额 |
 | ⚠️ 签到待确认 | Cookie 有效但签到没确认，或余额查询失败——请到网站核对能量历史 |
-| ❌ Cookie 已失效 | Cookie 已过期或无效——请在浏览器重新登录后复制新的 Cookie 更新模块参数 |
-| 🚫 未配置 Cookie | 模块参数里没填 Cookie |
+| ❌ Cookie 已失效 | Cookie 已过期或无效——请在浏览器重新登录并打开一次页面（自动抓新 Cookie），或复制新的 Cookie 更新到 BoxJS 里 |
+| 🚫 未配置 Cookie | 还没抓到 Cookie——请先在浏览器登录并打开一次 NodeLoc，或把 Cookie 填到 BoxJS 里 |
 
 ## 原理
 

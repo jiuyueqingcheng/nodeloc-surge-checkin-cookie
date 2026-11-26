@@ -38,27 +38,24 @@
  * 注意：本站可能有 Cloudflare 拦截，Surge 请求若被拦截会直接报出来，
  * 这种情况模块无解，只能手动在浏览器里签到。
  *
- * Cookie 填写（四选一，优先 $argument；另见自动捕获）：
+ * Cookie 填写（自动捕获优先；模块参数里已没有 cookie / name 这两项）：
  *   0. 自动捕获（推荐，不用手动复制）：模块里还有一个 nodeloc-cookie-capture.js
  *     （http-request 脚本），开关是模块参数 capture_cookie（默认开）。
  *      开着时，用浏览器打开一次 NodeLoc（登录状态），脚本会自动把请求里的
- *      Cookie 存下来，签到直接用最新抓到的；手动填的 cookie 参数会被它覆盖。
+ *      Cookie 存下来，签到直接用最新抓到的；手动在 BoxJS 里填的 Cookie 会被它覆盖。
  *      不想让它自动抓时，把 capture_cookie 改成 false，或在 Surge 脚本列表里
  *      单独关掉“NodeLoc Cookie 获取”这一项。
- *   1. Surge 模块参数（手动）：nodeloc-cookie.sgmodule 里用 #!arguments 声明了
- *      cookie、name，导入模块后在 Surge「编辑参数」里填写。
- *      Cookie 里有 & 请写成 %26（脚本会解码回来）；= 和 ; 不用转义。
- *   2. Surge 脚本的 argument 参数（字符串）：
+ *   1. BoxJS / $persistentStore（自动抓不到时手动填）：
+ *        nodeloc_cookie、nodeloc_cookie_name
+ *      多账号时在 BoxJS 填 nodeloc_cookie_accounts（JSON 数组，同下格式）。
+ *   2. 直接用脚本时的 argument 参数（字符串）：
  *        argument=cookie=你的Cookie&name=备注（可选）
  *      或 JSON：
  *        argument={"cookie":"你的Cookie","name":"备注"}
  *      多账号 JSON：
  *        argument={"accounts":[{"name":"a","cookie":"..."},{"name":"b","cookie":"..."}]}
- *   3. BoxJS / $persistentStore：
- *        nodeloc_cookie、nodeloc_cookie_name
- *      多账号时在 BoxJS 填 nodeloc_cookie_accounts（JSON 数组，同上格式）。
- *   Cookie 很长，填在模块参数里最方便；如果含特殊字符导致解析失败，
- *   改填 BoxJS（纯文本存储，不经过 argument 解析）。
+ *      Cookie 里有 & 请写成 %26（脚本会解码回来）；= 和 ; 不用转义。
+ *   Cookie 很长，填 BoxJS 最方便（纯文本存储，不经过 argument 解析）。
  *
  * 请勿把 Cookie 发到聊天或公开仓库，只填在 Surge / BoxJS 本地。
  * Cookie 等于登录态，泄露等于账号被盗用；失效后在网站退出登录即可作废。
@@ -87,7 +84,7 @@ $.merge = typeof $argument === "object" && !!$argument && $argument.merge === tr
 
 if ($.merge) $.msg = (...a) => console.log(a.filter((x) => typeof x === "string" && x).join("\n"));
 
-const SCRIPT_VERSION = "2026-11-26.r2";
+const SCRIPT_VERSION = "2026-11-26.r3";
 
 $.log(`[INFO] 脚本版本 ${SCRIPT_VERSION}`);
 
@@ -185,7 +182,7 @@ async function run() {
 
     if (!accounts.length) {
         saveStatus("none", "未配置 Cookie");
-        $.msg($.name, "🚫 未配置 Cookie", `请先在浏览器登录 NodeLoc 并复制 Cookie，再填到 ${SETTINGS_PAGE} 的 NodeLoc Cookie 里`);
+        $.msg($.name, "🚫 未配置 Cookie", `请先在浏览器登录 NodeLoc 并打开一次页面（自动抓 Cookie），或把 Cookie 填到 ${SETTINGS_PAGE} 的 NodeLoc Cookie 里`);
         return;
     }
 
