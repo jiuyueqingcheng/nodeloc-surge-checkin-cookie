@@ -69,7 +69,7 @@
  *
  * ===== Surge =====
  * [Script]
- * NodeLoc Cookie签到 = type=cron,cronexp="0 9 * * *",timeout=60,script-path=https://raw.githubusercontent.com/JiuYueQingCheng/nodeloc-surge-checkin-cookie/main/nodeloc-cookie.js,argument=cookie=你的Cookie&name=备注
+ * NodeLoc Cookie签到 = type=cron,cronexp="0 9 * * *",timeout=60,script-path=https://cdn.jsdelivr.net/gh/JiuYueQingCheng/nodeloc-surge-checkin-cookie@main/nodeloc-cookie.js,argument=cookie=你的Cookie&name=备注
  * 也可以直接用随附的 nodeloc-cookie.sgmodule 导入 Surge（见 README.md）。
  *
  * ===== Loon / Quantumult X / Stash =====
