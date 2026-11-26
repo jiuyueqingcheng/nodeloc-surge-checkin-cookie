@@ -28,7 +28,7 @@
  *
  * ===== Surge（见 nodeloc-cookie.sgmodule）=====
  * [Script]
- * NodeLoc Cookie获取 = type=http-request,pattern=^https://www\.nodeloc\.com/,requires-body=0,script-path=https://cdn.jsdelivr.net/gh/JiuYueQingCheng/nodeloc-surge-checkin-cookie@main/nodeloc-cookie-capture.js,argument=capture_cookie=true
+ * NodeLoc Cookie获取 = type=http-request,pattern=^https://www\.nodeloc\.com/,requires-body=0,script-path=https://raw.githubusercontent.com/JiuYueQingCheng/nodeloc-surge-checkin-cookie/main/nodeloc-cookie-capture.js,argument=capture_cookie=true
  */
 
 const $ = new Env("NodeLoc Cookie 获取");
